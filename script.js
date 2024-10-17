@@ -71,6 +71,10 @@ function changeDirection(event) {
     const RIGHT_KEY = 39;
     const UP_KEY = 38;
     const DOWN_KEY = 40;
+    const W_KEY = 87;
+    const A_KEY = 65;
+    const S_KEY = 83;
+    const D_KEY = 68;
 
     const keyPressed = event.keyCode;
     const goingUp = dy === -20;
@@ -78,19 +82,19 @@ function changeDirection(event) {
     const goingRight = dx === 20;
     const goingLeft = dx === -20;
 
-    if (keyPressed === LEFT_KEY && !goingRight) {
+    if ((keyPressed === LEFT_KEY || keyPressed === A_KEY) && !goingRight) {
         dx = -20;
         dy = 0;
     }
-    if (keyPressed === UP_KEY && !goingDown) {
+    if ((keyPressed === UP_KEY || keyPressed === W_KEY) && !goingDown) {
         dx = 0;
         dy = -20;
     }
-    if (keyPressed === RIGHT_KEY && !goingLeft) {
+    if ((keyPressed === RIGHT_KEY || keyPressed === D_KEY) && !goingLeft) {
         dx = 20;
         dy = 0;
     }
-    if (keyPressed === DOWN_KEY && !goingUp) {
+    if ((keyPressed === DOWN_KEY || keyPressed === S_KEY) && !goingUp) {
         dx = 0;
         dy = 20;
     }
