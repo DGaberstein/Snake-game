@@ -36,6 +36,7 @@ function moveSnake() {
         document.querySelector('.food').remove();
         createFood();
         increaseSpeed();
+        // Don't remove the tail to make the snake longer
     } else {
         snake.pop();
     }
@@ -58,6 +59,11 @@ function updateGameBoard() {
         snakePart.classList.add('snake-part');
         gameBoard.appendChild(snakePart);
     });
+    const foodElement = document.createElement('div');
+    foodElement.style.left = food.x + 'px';
+    foodElement.style.top = food.y + 'px';
+    foodElement.classList.add('food');
+    gameBoard.appendChild(foodElement);
 }
 
 function changeDirection(event) {
