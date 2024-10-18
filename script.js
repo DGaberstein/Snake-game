@@ -8,6 +8,10 @@ const finalScoreSpan = document.getElementById('final-score');
 const startButton = document.getElementById('start-button');
 const restartButton = document.getElementById('restart-button');
 const checkbox = document.getElementById('checkbox');
+const upButton = document.getElementById('up-button');
+const downButton = document.getElementById('down-button');
+const leftButton = document.getElementById('left-button');
+const rightButton = document.getElementById('right-button');
 
 let snake = [{x: 200, y: 200}];
 let food = {};
@@ -17,19 +21,131 @@ let score = 0;
 let gameSpeed = 100;
 let gameLoop;
 let leaderboard = [];
+let touchStartX = 0;
+let touchStartY = 0;
 
-function initGame() {
-    createFood();
-    addKeyboardListener();
-    gameLoop = setInterval(moveSnake, gameSpeed);
-    startButton.style.display = 'none';
-    restartButton.style.display = 'block';
+upButton.addEventListener('click', () => changeDirection({keyCode: 38}));
+downButton.addEventListener('click', () => changeDirection({keyCode: 40}));
+leftButton.addEventListener('click', () => changeDirection({keyCode: 37}));
+rightButton.addEventListener('click', () => changeDirection({keyCode: 39}));
+
+document.addEventListener('touchstart', handleTouchStart, false);
+document.addEventListener('touchmove', handleTouchMove, false);
+document.body.addEventListener('touchmove', function(e) {
+    e.preventDefault();
+}, { passive: false });
+
+function isMobileDevice() {
+    return (typeof window.orientation !== "undefined") || (navigator.userAgent.indexOf('IEMobile') !== -1);
 }
 
-function startGame() {
-    createFood();
-    startButton.style.display = 'block';
-    restartButton.style.display = 'none';
+function handleTouchStart(event) {
+    touchStartX = event.touches[0].clientX;
+    touchStartY = event.touches[0].clientY;
+}
+
+function handleTouchMove(event) {
+    if (!touchStartX || !touchStartY) {
+        return;
+    }
+
+    let touchEndX = event.touches[0].clientX;
+    let touchEndY = event.touches[0].clientY;
+
+    let deltaX = touchStartX - touchEndX;
+    let deltaY = touchStartY - touchEndY;
+
+    if (Math.abs(deltaX) > Math.abs(deltaY)) {
+        // Horizontal swipe
+        if (deltaX > 0) {
+            changeDirection({keyCode: 37}); // Left
+        } else {
+            changeDirection({keyCode: 39}); // Right
+        }
+    } else {
+        // Vertical swipe
+        if (deltaY > 0) {
+            changeDirection({keyCode: 38}); // Up
+        } else {
+            changeDirection({keyCode: 40}); // Down
+        }
+    }
+
+    // Reset touch start coordinates
+    touchStartX = 0;
+    touchStartY = 0;
+
+    event.preventDefault();
+}
+
+document.addEventListener('touchstart', function(event) {
+    touchStartX = event.touches[0].clientX;
+    touchStartY = event.touches[0].clientY;
+}, false);
+
+document.addEventListener('touchmove', function(event) {
+    if (!touchStartX || !touchStartY) {
+        return;
+    }
+
+    let touchEndX = event.touches[0].clientX;
+    let touchEndY = event.touches[0].clientY;
+
+    let dx = touchStartX - touchEndX;
+    let dy = touchStartY - touchEndY;
+
+    if (Math.abs(dx) > Math.abs(dy)) {
+        if (dx > 0) {
+            changeDirection({keyCode: 37}); // Left
+        } else {
+            changeDirection({keyCode: 39}); // Right
+        }
+    } else {
+        if (dy > 0) {
+            changeDirection({keyCode: 38}); // Up
+        } else {
+            changeDirection({keyCode: 40}); // Down
+        }
+    }
+
+    touchStartX = 0;
+    touchStartY = 0;
+
+    event.preventDefault();
+}, false);
+
+function changeDirection(event) {
+    const LEFT_KEY = 37;
+    const RIGHT_KEY = 39;
+    const UP_KEY = 38;
+    const DOWN_KEY = 40;
+    const W_KEY = 87;
+    const A_KEY = 65;
+    const S_KEY = 83;
+    const D_KEY = 68;
+
+    const keyPressed = event.keyCode;
+    const goingUp = dy === -20;
+    const goingDown = dy === 20;
+    const goingRight = dx === 20;
+    const goingLeft = dx === -20;
+
+    if ((keyPressed === LEFT_KEY || keyPressed === A_KEY) && !goingRight) {
+        dx = -20;
+        dy = 0;
+    }
+    if ((keyPressed === UP_KEY || keyPressed === W_KEY) && !goingDown) {
+        dx = 0;
+        dy = -20;
+    }
+    if ((keyPressed === RIGHT_KEY || keyPressed === D_KEY) && !goingLeft) {
+        dx = 20;
+        dy = 0;
+    }
+    if ((keyPressed === DOWN_KEY || keyPressed === S_KEY) && !goingUp) {
+        dx = 0;
+        dy = 20;
+    }
 }
 
 function createFood() {
@@ -73,40 +189,6 @@ function updateGameBoard() {
     foodElement.style.top = food.y + 'px';
     foodElement.classList.add('food');
     gameBoard.appendChild(foodElement);
-}
-
-function changeDirection(event) {
-    const LEFT_KEY = 37;
-    const RIGHT_KEY = 39;
-    const UP_KEY = 38;
-    const DOWN_KEY = 40;
-    const W_KEY = 87;
-    const A_KEY = 65;
-    const S_KEY = 83;
-    const D_KEY = 68;
-
-    const keyPressed = event.keyCode;
-    const goingUp = dy === -20;
-    const goingDown = dy === 20;
-    const goingRight = dx === 20;
-    const goingLeft = dx === -20;
-
-    if ((keyPressed === LEFT_KEY || keyPressed === A_KEY) && !goingRight) {
-        dx = -20;
-        dy = 0;
-    }
-    if ((keyPressed === UP_KEY || keyPressed === W_KEY) && !goingDown) {
-        dx = 0;
-        dy = -20;
-    }
-    if ((keyPressed === RIGHT_KEY || keyPressed === D_KEY) && !goingLeft) {
-        dx = 20;
-        dy = 0;
-    }
-    if ((keyPressed === DOWN_KEY || keyPressed === S_KEY) && !goingUp) {
-        dx = 0;
-        dy = 20;
-    }
 }
 
 function isGameOver() {
@@ -163,14 +245,6 @@ function updateLeaderboard() {
 }
 
 function initGame() {
-    createFood();
-    addKeyboardListener();
-    gameLoop = setInterval(moveSnake, gameSpeed);
-    startButton.style.display = 'none';
-    restartButton.style.display = 'block';
-}
-
-function resetGame() {
     snake = [{x: 200, y: 200}];
     dx = 20;
     dy = 0;
@@ -178,18 +252,35 @@ function resetGame() {
     gameSpeed = 100;
     scoreElement.textContent = 'Score: 0';
     createFood();
-    startButton.style.display = 'inline-block';
-    restartButton.style.display = 'none';
-}
-
-function restartGame() {
-    clearInterval(gameLoop);
-    removeKeyboardListener();
-    resetGame();
     addKeyboardListener();
     gameLoop = setInterval(moveSnake, gameSpeed);
     startButton.style.display = 'none';
     restartButton.style.display = 'block';
+
+    if (isMobileDevice()) {
+        document.getElementById('mobile-controls').style.display = 'flex';
+    }
+}
+
+function resetGame() {
+    clearInterval(gameLoop);
+    removeKeyboardListener();
+    snake = [{x: 200, y: 200}];
+    dx = 20;
+    dy = 0;
+    score = 0;
+    gameSpeed = 100;
+    scoreElement.textContent = 'Score: 0';
+    createFood();
+    updateGameBoard();
+    startButton.style.display = 'inline-block';
+    restartButton.style.display = 'none';
+    document.getElementById('mobile-controls').style.display = 'none';
+}
+
+function restartGame() {
+    resetGame();
+    initGame();
 }
 
 function addKeyboardListener() {
@@ -208,4 +299,5 @@ checkbox.addEventListener('change', () => {
     document.body.classList.toggle('dark-mode');
 });
 
-startGame();
+createFood();
+updateGameBoard();

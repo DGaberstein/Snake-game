@@ -6,6 +6,7 @@
     <title>Modern Snake Game</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 </head>
 <body>
     <div class="container">
@@ -30,6 +31,14 @@
             <input type="text" id="player-name" placeholder="Enter your name (optional)">
             <button id="submit-score">Submit Score</button>
         </div>
+    </div>
+    <div id="mobile-controls" class="mobile-only">
+        <button id="up-button">↑</button>
+        <div>
+            <button id="left-button">←</button>
+            <button id="right-button">→</button>
+        </div>
+        <button id="down-button">↓</button>
     </div>
     <div class="theme-switch-wrapper">
         <label class="theme-switch" for="checkbox">
