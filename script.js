@@ -43,9 +43,7 @@ function moveSnake() {
     }
 
     if (isGameOver()) {
-        clearInterval(gameLoop);
-        removeKeyboardListener();
-        showNameInput();
+        return;
     }
 
     updateGameBoard();
@@ -103,11 +101,21 @@ function changeDirection(event) {
 
 function isGameOver() {
     const head = snake[0];
-    return (
+    if (
         head.x < 0 || head.x >= 400 ||
         head.y < 0 || head.y >= 400 ||
         snake.slice(1).some(part => part.x === head.x && part.y === head.y)
-    );
+    ) {
+        clearInterval(gameLoop);
+        removeKeyboardListener();
+        if (score > 0) {
+            showNameInput();
+        } else {
+            resetGame();
+        }
+        return true;
+    }
+    return false;
 }
 
 function increaseSpeed() {
@@ -124,11 +132,13 @@ function showNameInput() {
 }
 
 function submitScore() {
-    const playerName = playerNameInput.value.trim() || 'Anonymous';
-    leaderboard.push({name: playerName, score: score});
-    leaderboard.sort((a, b) => b.score - a.score);
-    leaderboard = leaderboard.slice(0, 5);
-    updateLeaderboard();
+    if (score > 0) {
+        const playerName = playerNameInput.value.trim() || 'Anonymous';
+        leaderboard.push({name: playerName, score: score});
+        leaderboard.sort((a, b) => b.score - a.score);
+        leaderboard = leaderboard.slice(0, 5);
+        updateLeaderboard();
+    }
     nameInput.style.display = 'none';
     resetGame();
 }
