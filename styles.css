@@ -139,8 +139,6 @@ input {
     right: 20px;
 }
 
-/* ... existing styles ... */
-
 .theme-switch-wrapper {
     position: fixed;
     top: 20px;
@@ -251,4 +249,21 @@ input:not(:checked) + .slider .fa-moon {
 #restart-button {
     display: none;
     margin-top: 20px;
+}
+
+.leaderboard-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#score {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: var(--text-color);
+}
+
+.leaderboard-container h2 {
+    margin-top: 0;
 }

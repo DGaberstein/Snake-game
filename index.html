@@ -8,16 +8,17 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
 </head>
 <body>
-    <div class="game-container">
-        <div class="game-header">
-            <h1>Snake Game</h1>
-            <button id="start-button">Start Game</button>
+    <div class="container">
+        <div class="game-container">
+            <div class="game-header">
+                <h1>Snake Game</h1>
+                <button id="start-button">Start Game</button>
+            </div>
+            <div id="game-board"></div>
+            <button id="restart-button" style="display: none;">Restart Game</button>
         </div>
-        <div id="game-board"></div>
-        <div id="score">Score: 0</div>
-        <button id="restart-button" style="display: none;">Restart Game</button>
-    </div>
         <div class="leaderboard-container">
+            <div id="score">Score:</div>
             <h2>Leaderboard</h2>
             <ul id="leaderboard-list"></ul>
         </div>
