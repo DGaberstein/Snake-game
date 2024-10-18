@@ -5,16 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Modern Snake Game</title>
     <link rel="stylesheet" href="styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
 </head>
 <body>
-    <div class="container">
-        <div class="game-container">
+    <div class="game-container">
+        <div class="game-header">
             <h1>Snake Game</h1>
-            <div id="game-board"></div>
-            <div id="score">Score: 0</div>
-            <button id="restart-button">Restart Game</button>
+            <button id="start-button">Start Game</button>
         </div>
+        <div id="game-board"></div>
+        <div id="score">Score: 0</div>
+        <button id="restart-button" style="display: none;">Restart Game</button>
+    </div>
         <div class="leaderboard-container">
             <h2>Leaderboard</h2>
             <ul id="leaderboard-list"></ul>
@@ -28,7 +30,15 @@
             <button id="submit-score">Submit Score</button>
         </div>
     </div>
-    <button id="dark-mode-toggle">Toggle Dark Mode</button>
+    <div class="theme-switch-wrapper">
+        <label class="theme-switch" for="checkbox">
+            <input type="checkbox" id="checkbox" />
+            <div class="slider round">
+                <i class="fas fa-sun"></i>
+                <i class="fas fa-moon"></i>
+            </div>
+        </label>
+    </div>
     <script src="script.js"></script>
 </body>
 </html>

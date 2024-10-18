@@ -5,7 +5,9 @@ const nameInput = document.getElementById('name-input');
 const playerNameInput = document.getElementById('player-name');
 const submitScoreButton = document.getElementById('submit-score');
 const finalScoreSpan = document.getElementById('final-score');
+const startButton = document.getElementById('start-button');
 const restartButton = document.getElementById('restart-button');
+const checkbox = document.getElementById('checkbox');
 
 let snake = [{x: 200, y: 200}];
 let food = {};
@@ -16,10 +18,18 @@ let gameSpeed = 100;
 let gameLoop;
 let leaderboard = [];
 
-function startGame() {
+function initGame() {
     createFood();
     addKeyboardListener();
-    restartGame();
+    gameLoop = setInterval(moveSnake, gameSpeed);
+    startButton.style.display = 'none';
+    restartButton.style.display = 'block';
+}
+
+function startGame() {
+    createFood();
+    startButton.style.display = 'block';
+    restartButton.style.display = 'none';
 }
 
 function createFood() {
@@ -152,13 +162,15 @@ function updateLeaderboard() {
     });
 }
 
-function resetGame() {
-    restartGame();
+function initGame() {
+    createFood();
+    addKeyboardListener();
+    gameLoop = setInterval(moveSnake, gameSpeed);
+    startButton.style.display = 'none';
+    restartButton.style.display = 'block';
 }
 
-function restartGame() {
-    clearInterval(gameLoop);
-    removeKeyboardListener();
+function resetGame() {
     snake = [{x: 200, y: 200}];
     dx = 20;
     dy = 0;
@@ -166,8 +178,18 @@ function restartGame() {
     gameSpeed = 100;
     scoreElement.textContent = 'Score: 0';
     createFood();
+    startButton.style.display = 'inline-block';
+    restartButton.style.display = 'none';
+}
+
+function restartGame() {
+    clearInterval(gameLoop);
+    removeKeyboardListener();
+    resetGame();
     addKeyboardListener();
     gameLoop = setInterval(moveSnake, gameSpeed);
+    startButton.style.display = 'none';
+    restartButton.style.display = 'block';
 }
 
 function addKeyboardListener() {
@@ -178,11 +200,12 @@ function removeKeyboardListener() {
     document.removeEventListener('keydown', changeDirection);
 }
 
-submitScoreButton.addEventListener('click', submitScore);
+startButton.addEventListener('click', initGame);
 restartButton.addEventListener('click', restartGame);
-startGame();
+submitScoreButton.addEventListener('click', submitScore);
 
-const darkModeToggle = document.getElementById('dark-mode-toggle');
-darkModeToggle.addEventListener('click', () => {
+checkbox.addEventListener('change', () => {
     document.body.classList.toggle('dark-mode');
 });
+
+startGame();
