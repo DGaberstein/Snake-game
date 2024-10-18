@@ -12,6 +12,7 @@ const upButton = document.getElementById('up-button');
 const downButton = document.getElementById('down-button');
 const leftButton = document.getElementById('left-button');
 const rightButton = document.getElementById('right-button');
+const mobileControls = document.getElementById('mobile-controls');
 
 let snake = [{x: 200, y: 200}];
 let food = {};
@@ -24,10 +25,10 @@ let leaderboard = [];
 let touchStartX = 0;
 let touchStartY = 0;
 
-upButton.addEventListener('click', () => changeDirection({keyCode: 38}));
-downButton.addEventListener('click', () => changeDirection({keyCode: 40}));
-leftButton.addEventListener('click', () => changeDirection({keyCode: 37}));
-rightButton.addEventListener('click', () => changeDirection({keyCode: 39}));
+upButton.addEventListener('touchstart', () => changeDirection({keyCode: 38}));
+downButton.addEventListener('touchstart', () => changeDirection({keyCode: 40}));
+leftButton.addEventListener('touchstart', () => changeDirection({keyCode: 37}));
+rightButton.addEventListener('touchstart', () => changeDirection({keyCode: 39}));
 
 document.addEventListener('touchstart', handleTouchStart, false);
 document.addEventListener('touchmove', handleTouchMove, false);
@@ -258,7 +259,10 @@ function initGame() {
     restartButton.style.display = 'block';
 
     if (isMobileDevice()) {
-        document.getElementById('mobile-controls').style.display = 'flex';
+        mobileControls.style.display = 'flex';
+        // Adjust game board size for mobile
+        gameBoard.style.width = '100%';
+        gameBoard.style.height = '100vw';
     }
 }
 
@@ -276,6 +280,10 @@ function resetGame() {
     startButton.style.display = 'inline-block';
     restartButton.style.display = 'none';
     document.getElementById('mobile-controls').style.display = 'none';
+    mobileControls.style.display = 'none';
+    // Reset game board size
+    gameBoard.style.width = '';
+    gameBoard.style.height = '';
 }
 
 function restartGame() {

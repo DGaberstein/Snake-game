@@ -284,31 +284,34 @@ input:not(:checked) + .slider .fa-moon {
 #mobile-controls {
     position: fixed;
     bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
+    left: 0;
+    right: 0;
     display: none;
-    flex-direction: column;
+    justify-content: center;
     align-items: center;
     z-index: 1000;
+}
+
+#mobile-controls .control-row {
+    display: flex;
+    justify-content: center;
+    margin: 5px 0;
 }
 
 #mobile-controls button {
     width: 60px;
     height: 60px;
     font-size: 24px;
-    margin: 5px;
+    margin: 0 5px;
     background-color: rgba(76, 175, 80, 0.7);
     border: none;
     border-radius: 50%;
     color: white;
-}
-
-.mobile-only {
-    display: none;
+    touch-action: manipulation;
 }
 
 @media (max-width: 768px) {
-    .mobile-only {
-        display: block;
+    .container {
+        padding-bottom: 200px;
     }
 }
