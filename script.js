@@ -24,6 +24,10 @@ let gameLoop;
 let leaderboard = [];
 let touchStartX = 0;
 let touchStartY = 0;
+let initialGameSpeed = 100;
+let mobileGameSpeed = 150;
+let speedIncreaseRate = 2;
+let mobileSpeedIncreaseRate = 1;
 
 upButton.addEventListener('touchstart', () => changeDirection({keyCode: 38}));
 downButton.addEventListener('touchstart', () => changeDirection({keyCode: 40}));
@@ -212,10 +216,18 @@ function isGameOver() {
 }
 
 function increaseSpeed() {
-    if (gameSpeed > 50) {
-        gameSpeed -= 2;
-        clearInterval(gameLoop);
-        gameLoop = setInterval(moveSnake, gameSpeed);
+    if (isMobileDevice()) {
+        if (gameSpeed > 70) {
+            gameSpeed -= mobileSpeedIncreaseRate;
+            clearInterval(gameLoop);
+            gameLoop = setInterval(moveSnake, gameSpeed);
+        }
+    } else {
+        if (gameSpeed > 50) {
+            gameSpeed -= speedIncreaseRate;
+            clearInterval(gameLoop);
+            gameLoop = setInterval(moveSnake, gameSpeed);
+        }
     }
 }
 
@@ -250,7 +262,17 @@ function initGame() {
     dx = 20;
     dy = 0;
     score = 0;
-    gameSpeed = 100;
+    
+    if (isMobileDevice()) {
+        gameSpeed = mobileGameSpeed;
+        mobileControls.style.display = 'flex';
+        // Adjust game board size for mobile
+        gameBoard.style.width = '100%';
+        gameBoard.style.height = '100vw';
+    } else {
+        gameSpeed = initialGameSpeed;
+    }
+    
     scoreElement.textContent = 'Score: 0';
     createFood();
     addKeyboardListener();
@@ -273,13 +295,12 @@ function resetGame() {
     dx = 20;
     dy = 0;
     score = 0;
-    gameSpeed = 100;
+    gameSpeed = isMobileDevice() ? mobileGameSpeed : initialGameSpeed;
     scoreElement.textContent = 'Score: 0';
     createFood();
     updateGameBoard();
     startButton.style.display = 'inline-block';
     restartButton.style.display = 'none';
-    document.getElementById('mobile-controls').style.display = 'none';
     mobileControls.style.display = 'none';
     // Reset game board size
     gameBoard.style.width = '';
