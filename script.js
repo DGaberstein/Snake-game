@@ -171,3 +171,8 @@ function removeKeyboardListener() {
 submitScoreButton.addEventListener('click', submitScore);
 restartButton.addEventListener('click', restartGame);
 startGame();
+
+const darkModeToggle = document.getElementById('dark-mode-toggle');
+darkModeToggle.addEventListener('click', () => {
+    document.body.classList.toggle('dark-mode');
+});

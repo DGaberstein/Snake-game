@@ -8,12 +8,14 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="game-container">
-        <h1>Snake Game</h1>
-        <div id="game-board"></div>
-        <div id="score">Score: 0</div>
-        <button id="restart-button">Restart Game</button>
-        <div id="leaderboard">
+    <div class="container">
+        <div class="game-container">
+            <h1>Snake Game</h1>
+            <div id="game-board"></div>
+            <div id="score">Score: 0</div>
+            <button id="restart-button">Restart Game</button>
+        </div>
+        <div class="leaderboard-container">
             <h2>Leaderboard</h2>
             <ul id="leaderboard-list"></ul>
         </div>
@@ -26,6 +28,7 @@
             <button id="submit-score">Submit Score</button>
         </div>
     </div>
+    <button id="dark-mode-toggle">Toggle Dark Mode</button>
     <script src="script.js"></script>
 </body>
 </html>
