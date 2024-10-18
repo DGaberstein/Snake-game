@@ -18,8 +18,8 @@ let leaderboard = [];
 
 function startGame() {
     createFood();
-    document.addEventListener('keydown', changeDirection);
-    restartGame(); // This will set up the initial game state
+    addKeyboardListener();
+    restartGame();
 }
 
 function createFood() {
@@ -44,6 +44,7 @@ function moveSnake() {
 
     if (isGameOver()) {
         clearInterval(gameLoop);
+        removeKeyboardListener();
         showNameInput();
     }
 
@@ -102,15 +103,11 @@ function changeDirection(event) {
 
 function isGameOver() {
     const head = snake[0];
-    if (
+    return (
         head.x < 0 || head.x >= 400 ||
         head.y < 0 || head.y >= 400 ||
         snake.slice(1).some(part => part.x === head.x && part.y === head.y)
-    ) {
-        document.removeEventListener('keydown', changeDirection);
-        return true;
-    }
-    return false;
+    );
 }
 
 function increaseSpeed() {
@@ -133,7 +130,6 @@ function submitScore() {
     leaderboard = leaderboard.slice(0, 5);
     updateLeaderboard();
     nameInput.style.display = 'none';
-    document.addEventListener('keydown', changeDirection);
     resetGame();
 }
 
@@ -152,6 +148,7 @@ function resetGame() {
 
 function restartGame() {
     clearInterval(gameLoop);
+    removeKeyboardListener();
     snake = [{x: 200, y: 200}];
     dx = 20;
     dy = 0;
@@ -159,7 +156,16 @@ function restartGame() {
     gameSpeed = 100;
     scoreElement.textContent = 'Score: 0';
     createFood();
+    addKeyboardListener();
     gameLoop = setInterval(moveSnake, gameSpeed);
+}
+
+function addKeyboardListener() {
+    document.addEventListener('keydown', changeDirection);
+}
+
+function removeKeyboardListener() {
+    document.removeEventListener('keydown', changeDirection);
 }
 
 submitScoreButton.addEventListener('click', submitScore);
