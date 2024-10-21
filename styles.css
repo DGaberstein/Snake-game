@@ -66,27 +66,32 @@ h1, h2 {
 }
 
 .snake-part {
+    position: absolute;
+    width: 20px;
+    height: 20px;
     background-color: #4CAF50;
     border-radius: 50%;
-    box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
-    transition: all 0.1s ease;
+    box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
 }
 
 .snake-head {
     background-color: #45a049;
-    box-shadow: 0 0 15px rgba(69, 160, 73, 0.7);
+    box-shadow: 0 0 8px rgba(69, 160, 73, 0.7);
 }
 
 .food {
+    position: absolute;
+    width: 20px;
+    height: 20px;
     background-color: #FF5722;
     border-radius: 50%;
-    box-shadow: 0 0 10px rgba(255, 87, 34, 0.5);
+    box-shadow: 0 0 5px rgba(255, 87, 34, 0.5);
     animation: pulse 1s infinite alternate;
 }
 
 @keyframes pulse {
     from {
-        transform: scale(0.8);
+        transform: scale(0.9);
     }
     to {
         transform: scale(1.1);
@@ -265,7 +270,7 @@ input:not(:checked) + .slider .fa-moon {
     align-items: center;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 768px) {}
     .container {
         flex-direction: row;
         justify-content: center;
@@ -287,19 +292,18 @@ input:not(:checked) + .slider .fa-moon {
     #game-board {
         width: 400px;
         height: 400px;
-        padding-bottom: 0;
+        border: 2px solid var(--text-color);
+        border-radius: 10px;
+        position: relative;
+        overflow: hidden;
+        background: linear-gradient(45deg, #f3f3f3, #e0e0e0);
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
     }
 
     #game-board {
         background: linear-gradient(45deg, #f3f3f3, #e0e0e0);
         box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
     }
-
-    .snake-part, .food {
-        width: 20px;
-        height: 20px;
-    }
-}
 
 .snake-trail {
     position: absolute;

@@ -155,10 +155,14 @@ function changeDirection(event) {
 }
 
 function createFood() {
-    food = {
-        x: Math.floor(Math.random() * 20) * 20,
-        y: Math.floor(Math.random() * 20) * 20
-    };
+    let newFood;
+    do {
+        newFood = {
+            x: Math.floor(Math.random() * 20) * 20,
+            y: Math.floor(Math.random() * 20) * 20
+        };
+    } while (snake.some(part => part.x === newFood.x && part.y === newFood.y));
+    food = newFood;
 }
 
 function moveSnake() {
@@ -192,14 +196,6 @@ function updateGameBoard() {
             snakePart.classList.add('snake-head');
         }
         gameBoard.appendChild(snakePart);
-
-        // Add trail effect
-        const trail = document.createElement('div');
-        trail.style.left = part.x + 'px';
-        trail.style.top = part.y + 'px';
-        trail.style.width = trail.style.height = `${20 - index * 2}px`;
-        trail.classList.add('snake-trail');
-        gameBoard.appendChild(trail);
     });
     const foodElement = document.createElement('div');
     foodElement.style.left = food.x + 'px';
