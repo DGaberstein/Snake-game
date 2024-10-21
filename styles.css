@@ -171,9 +171,6 @@ input {
     right: 0;
     top: 0;
     transition: .4s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
 }
 
 .slider:before {
@@ -203,31 +200,22 @@ input:checked + .slider:before {
     border-radius: 50%;
 }
 
-.mode-text {
-    color: #333;
-    font-size: 12px;
-    font-weight: bold;
-    transition: .4s;
-}
-
-input:checked + .slider .mode-text {
-    color: #fff;
-}
-
 .fa-sun, .fa-moon {
     position: absolute;
-    top: 6px;
+    top: 7px;
     z-index: 1;
-    color: #fff;
+    font-size: 20px;
     transition: .4s;
 }
 
 .fa-sun {
-    left: 6px;
+    left: 7px;
+    color: #ffd700;
 }
 
 .fa-moon {
-    right: 6px;
+    right: 7px;
+    color: #f4f3ef;
 }
 
 input:checked + .slider .fa-sun {

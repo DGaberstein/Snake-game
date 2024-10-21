@@ -19,15 +19,15 @@ let food = {};
 let dx = 20;
 let dy = 0;
 let score = 0;
-let gameSpeed = 100;
+let gameSpeed = 250;
 let gameLoop;
 let leaderboard = [];
 let touchStartX = 0;
 let touchStartY = 0;
-let initialGameSpeed = 200;
+let initialGameSpeed = 250;
 let mobileGameSpeed = 250;
-let speedIncreaseRate = 1;
-let mobileSpeedIncreaseRate = 0.5;
+let speedIncreaseRate = 0.0025; 
+let mobileSpeedIncreaseRate = 0.0025;
 let currentGameSpeed;
 
 upButton.addEventListener('touchstart', () => changeDirection({keyCode: 38}));
@@ -218,13 +218,13 @@ function isGameOver() {
 
 function increaseSpeed() {
     if (isMobileDevice()) {
-        if (gameSpeed > 100) {
+        if (gameSpeed > 150) {
             gameSpeed -= mobileSpeedIncreaseRate;
             clearInterval(gameLoop);
             gameLoop = setInterval(moveSnake, gameSpeed);
         }
     } else {
-        if (gameSpeed > 80) {
+        if (gameSpeed > 120) {
             gameSpeed -= speedIncreaseRate;
             clearInterval(gameLoop);
             gameLoop = setInterval(moveSnake, gameSpeed);
@@ -319,12 +319,6 @@ submitScoreButton.addEventListener('click', submitScore);
 
 checkbox.addEventListener('change', () => {
     document.body.classList.toggle('dark-mode');
-    const modeText = document.querySelector('.mode-text');
-    if (document.body.classList.contains('dark-mode')) {
-        modeText.textContent = 'Dark';
-    } else {
-        modeText.textContent = 'Light';
-    }
 });
 
 createFood();
