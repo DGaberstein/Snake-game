@@ -65,19 +65,32 @@ h1, h2 {
     overflow: hidden;
 }
 
-.snake-part, .food {
-    width: 5%;
-    height: 5%;
-    position: absolute;
+.snake-part {
+    background-color: #4CAF50;
     border-radius: 50%;
+    box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+    transition: all 0.1s ease;
 }
 
-.snake-part {
-    background-color: var(--snake-color);
+.snake-head {
+    background-color: #45a049;
+    box-shadow: 0 0 15px rgba(69, 160, 73, 0.7);
 }
 
 .food {
-    background-color: var(--food-color);
+    background-color: #FF5722;
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgba(255, 87, 34, 0.5);
+    animation: pulse 1s infinite alternate;
+}
+
+@keyframes pulse {
+    from {
+        transform: scale(0.8);
+    }
+    to {
+        transform: scale(1.1);
+    }
 }
 
 #score {
@@ -277,10 +290,22 @@ input:not(:checked) + .slider .fa-moon {
         padding-bottom: 0;
     }
 
+    #game-board {
+        background: linear-gradient(45deg, #f3f3f3, #e0e0e0);
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    }
+
     .snake-part, .food {
         width: 20px;
         height: 20px;
     }
+}
+
+.snake-trail {
+    position: absolute;
+    background-color: rgba(76, 175, 80, 0.2);
+    border-radius: 50%;
+    transition: all 0.5s ease;
 }
 
 #mobile-controls {

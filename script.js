@@ -183,12 +183,23 @@ function moveSnake() {
 
 function updateGameBoard() {
     gameBoard.innerHTML = '';
-    snake.forEach(part => {
+    snake.forEach((part, index) => {
         const snakePart = document.createElement('div');
         snakePart.style.left = part.x + 'px';
         snakePart.style.top = part.y + 'px';
         snakePart.classList.add('snake-part');
+        if (index === 0) {
+            snakePart.classList.add('snake-head');
+        }
         gameBoard.appendChild(snakePart);
+
+        // Add trail effect
+        const trail = document.createElement('div');
+        trail.style.left = part.x + 'px';
+        trail.style.top = part.y + 'px';
+        trail.style.width = trail.style.height = `${20 - index * 2}px`;
+        trail.classList.add('snake-trail');
+        gameBoard.appendChild(trail);
     });
     const foodElement = document.createElement('div');
     foodElement.style.left = food.x + 'px';
