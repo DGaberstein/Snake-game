@@ -171,6 +171,9 @@ input {
     right: 0;
     top: 0;
     transition: .4s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .slider:before {
@@ -198,6 +201,17 @@ input:checked + .slider:before {
 
 .slider.round:before {
     border-radius: 50%;
+}
+
+.mode-text {
+    color: #333;
+    font-size: 12px;
+    font-weight: bold;
+    transition: .4s;
+}
+
+input:checked + .slider .mode-text {
+    color: #fff;
 }
 
 .fa-sun, .fa-moon {
