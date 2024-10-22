@@ -1,3 +1,12 @@
+// Constants
+const GRID_SIZE = 20;
+const INITIAL_SNAKE_POSITION = { x: 200, y: 200 };
+const INITIAL_GAME_SPEED = 250;
+const MOBILE_GAME_SPEED = 250;
+const SPEED_INCREASE_RATE = 0.0025;
+const MOBILE_SPEED_INCREASE_RATE = 0.0025;
+
+// DOM Elements
 const gameBoard = document.getElementById('game-board');
 const scoreElement = document.getElementById('score');
 const leaderboardList = document.getElementById('leaderboard-list');
@@ -8,39 +17,51 @@ const finalScoreSpan = document.getElementById('final-score');
 const startButton = document.getElementById('start-button');
 const restartButton = document.getElementById('restart-button');
 const checkbox = document.getElementById('checkbox');
-const upButton = document.getElementById('up-button');
-const downButton = document.getElementById('down-button');
-const leftButton = document.getElementById('left-button');
-const rightButton = document.getElementById('right-button');
 const mobileControls = document.getElementById('mobile-controls');
+const fullscreenToggle = document.getElementById('fullscreen-toggle');
 
-let snake = [{x: 200, y: 200}];
+// Game state
+let snake = [INITIAL_SNAKE_POSITION];
 let food = {};
-let dx = 20;
+let dx = GRID_SIZE;
 let dy = 0;
 let score = 0;
-let gameSpeed = 250;
+let gameSpeed = INITIAL_GAME_SPEED;
 let gameLoop;
 let leaderboard = [];
+let isFullscreen = false;
+
+// Touch handling
 let touchStartX = 0;
 let touchStartY = 0;
-let initialGameSpeed = 250;
-let mobileGameSpeed = 250;
-let speedIncreaseRate = 0.0025; 
-let mobileSpeedIncreaseRate = 0.0025;
-let currentGameSpeed;
 
-upButton.addEventListener('touchstart', () => changeDirection({keyCode: 38}));
-downButton.addEventListener('touchstart', () => changeDirection({keyCode: 40}));
-leftButton.addEventListener('touchstart', () => changeDirection({keyCode: 37}));
-rightButton.addEventListener('touchstart', () => changeDirection({keyCode: 39}));
+// Mobile controls
+const mobileButtons = {
+    up: document.getElementById('up-button'),
+    down: document.getElementById('down-button'),
+    left: document.getElementById('left-button'),
+    right: document.getElementById('right-button')
+};
 
-document.addEventListener('touchstart', handleTouchStart, false);
-document.addEventListener('touchmove', handleTouchMove, false);
-document.body.addEventListener('touchmove', function(e) {
-    e.preventDefault();
-}, { passive: false });
+Object.values(mobileButtons).forEach(button => {
+    button.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        changeDirection({ keyCode: parseInt(button.dataset.key) });
+    });
+});
 
+// Event Listeners
+document.addEventListener('keydown', changeDirection);
+document.addEventListener('touchstart', handleTouchStart, { passive: false });
+document.addEventListener('touchmove', handleTouchMove, { passive: false });
+startButton.addEventListener('click', initGame);
+restartButton.addEventListener('click', restartGame);
+submitScoreButton.addEventListener('click', submitScore);
+checkbox.addEventListener('change', toggleDarkMode);
+fullscreenToggle.addEventListener('click', toggleFullscreen);
+window.addEventListener('resize', updateGameBoardSize);
+
+// Utility Functions
 function isMobileDevice() {
     return (typeof window.orientation !== "undefined") || (navigator.userAgent.indexOf('IEMobile') !== -1);
 }
@@ -51,9 +72,7 @@ function handleTouchStart(event) {
 }
 
 function handleTouchMove(event) {
-    if (!touchStartX || !touchStartY) {
-        return;
-    }
+    if (!touchStartX || !touchStartY) return;
 
     let touchEndX = event.touches[0].clientX;
     let touchEndY = event.touches[0].clientY;
@@ -62,113 +81,61 @@ function handleTouchMove(event) {
     let deltaY = touchStartY - touchEndY;
 
     if (Math.abs(deltaX) > Math.abs(deltaY)) {
-        // Horizontal swipe
-        if (deltaX > 0) {
-            changeDirection({keyCode: 37}); // Left
-        } else {
-            changeDirection({keyCode: 39}); // Right
-        }
+        changeDirection({ keyCode: deltaX > 0 ? 37 : 39 });
     } else {
-        // Vertical swipe
-        if (deltaY > 0) {
-            changeDirection({keyCode: 38}); // Up
-        } else {
-            changeDirection({keyCode: 40}); // Down
-        }
+        changeDirection({ keyCode: deltaY > 0 ? 38 : 40 });
     }
 
-    // Reset touch start coordinates
     touchStartX = 0;
     touchStartY = 0;
-
     event.preventDefault();
 }
-
-document.addEventListener('touchstart', function(event) {
-    touchStartX = event.touches[0].clientX;
-    touchStartY = event.touches[0].clientY;
-}, false);
-
-document.addEventListener('touchmove', function(event) {
-    if (!touchStartX || !touchStartY) {
-        return;
-    }
-
-    let touchEndX = event.touches[0].clientX;
-    let touchEndY = event.touches[0].clientY;
-
-    let dx = touchStartX - touchEndX;
-    let dy = touchStartY - touchEndY;
-
-    if (Math.abs(dx) > Math.abs(dy)) {
-        if (dx > 0) {
-            changeDirection({keyCode: 37}); // Left
-        } else {
-            changeDirection({keyCode: 39}); // Right
-        }
-    } else {
-        if (dy > 0) {
-            changeDirection({keyCode: 38}); // Up
-        } else {
-            changeDirection({keyCode: 40}); // Down
-        }
-    }
-
-    touchStartX = 0;
-    touchStartY = 0;
-
-    event.preventDefault();
-}, false);
 
 function changeDirection(event) {
     const LEFT_KEY = 37;
     const RIGHT_KEY = 39;
     const UP_KEY = 38;
     const DOWN_KEY = 40;
-    const W_KEY = 87;
-    const A_KEY = 65;
-    const S_KEY = 83;
-    const D_KEY = 68;
 
     const keyPressed = event.keyCode;
-    const goingUp = dy === -20;
-    const goingDown = dy === 20;
-    const goingRight = dx === 20;
-    const goingLeft = dx === -20;
+    const goingUp = dy === -GRID_SIZE;
+    const goingDown = dy === GRID_SIZE;
+    const goingRight = dx === GRID_SIZE;
+    const goingLeft = dx === -GRID_SIZE;
 
-    if ((keyPressed === LEFT_KEY || keyPressed === A_KEY) && !goingRight) {
-        dx = -20;
+    if (keyPressed === LEFT_KEY && !goingRight) {
+        dx = -GRID_SIZE;
         dy = 0;
     }
-    if ((keyPressed === UP_KEY || keyPressed === W_KEY) && !goingDown) {
+    if (keyPressed === UP_KEY && !goingDown) {
         dx = 0;
-        dy = -20;
+        dy = -GRID_SIZE;
     }
-    if ((keyPressed === RIGHT_KEY || keyPressed === D_KEY) && !goingLeft) {
-        dx = 20;
+    if (keyPressed === RIGHT_KEY && !goingLeft) {
+        dx = GRID_SIZE;
         dy = 0;
     }
-    if ((keyPressed === DOWN_KEY || keyPressed === S_KEY) && !goingUp) {
+    if (keyPressed === DOWN_KEY && !goingUp) {
         dx = 0;
-        dy = 20;
+        dy = GRID_SIZE;
     }
 }
 
 function createFood() {
-    let newFood;
-    do {
-        newFood = {
-            x: Math.floor(Math.random() * 20) * 20,
-            y: Math.floor(Math.random() * 20) * 20
-        };
-    } while (snake.some(part => part.x === newFood.x && part.y === newFood.y));
-    food = newFood;
+    food = {
+        x: Math.floor(Math.random() * (gameBoard.clientWidth / GRID_SIZE)) * GRID_SIZE,
+        y: Math.floor(Math.random() * (gameBoard.clientHeight / GRID_SIZE)) * GRID_SIZE
+    };
+    // Ensure food doesn't appear on snake
+    while (snake.some(part => part.x === food.x && part.y === food.y)) {
+        createFood();
+    }
 }
 
 function moveSnake() {
-    const head = {x: snake[0].x + dx, y: snake[0].y + dy};
+    const head = { x: snake[0].x + dx, y: snake[0].y + dy };
     
-    if (head.x < 0 || head.x >= 400 || head.y < 0 || head.y >= 400) {
+    if (isCollision(head)) {
         gameOver();
         return;
     }
@@ -184,41 +151,43 @@ function moveSnake() {
         snake.pop();
     }
 
-    if (isGameOver()) {
-        gameOver();
-        return;
-    }
-
     updateGameBoard();
 }
 
+function isCollision(position) {
+    return position.x < 0 || 
+           position.x >= gameBoard.clientWidth || 
+           position.y < 0 || 
+           position.y >= gameBoard.clientHeight ||
+           snake.slice(1).some(part => part.x === position.x && part.y === position.y);
+}
+
 function updateGameBoard() {
-    gameBoard.innerHTML = '';
+    // Clear previous state
+    while (gameBoard.firstChild) {
+        gameBoard.removeChild(gameBoard.firstChild);
+    }
+
+    // Draw snake
     snake.forEach((part, index) => {
         const snakePart = document.createElement('div');
-        snakePart.style.left = part.x + 'px';
-        snakePart.style.top = part.y + 'px';
+        snakePart.style.left = `${part.x}px`;
+        snakePart.style.top = `${part.y}px`;
         snakePart.classList.add('snake-part');
-        if (index === 0) {
-            snakePart.classList.add('snake-head');
-        }
+        if (index === 0) snakePart.classList.add('snake-head');
         gameBoard.appendChild(snakePart);
     });
+
+    // Draw food
     const foodElement = document.createElement('div');
-    foodElement.style.left = food.x + 'px';
-    foodElement.style.top = food.y + 'px';
+    foodElement.style.left = `${food.x}px`;
+    foodElement.style.top = `${food.y}px`;
     foodElement.classList.add('food');
     gameBoard.appendChild(foodElement);
 }
 
-function isGameOver() {
-    const head = snake[0];
-    return snake.slice(1).some(part => part.x === head.x && part.y === head.y);
-}
-
 function gameOver() {
     clearInterval(gameLoop);
-    removeKeyboardListener();
     if (score > 0) {
         showNameInput();
     } else {
@@ -229,17 +198,20 @@ function gameOver() {
 function increaseSpeed() {
     if (isMobileDevice()) {
         if (gameSpeed > 150) {
-            gameSpeed -= mobileSpeedIncreaseRate;
-            clearInterval(gameLoop);
-            gameLoop = setInterval(moveSnake, gameSpeed);
+            gameSpeed -= MOBILE_SPEED_INCREASE_RATE;
+            resetGameLoop();
         }
     } else {
         if (gameSpeed > 120) {
-            gameSpeed -= speedIncreaseRate;
-            clearInterval(gameLoop);
-            gameLoop = setInterval(moveSnake, gameSpeed);
+            gameSpeed -= SPEED_INCREASE_RATE;
+            resetGameLoop();
         }
     }
+}
+
+function resetGameLoop() {
+    clearInterval(gameLoop);
+    gameLoop = setInterval(moveSnake, gameSpeed);
 }
 
 function showNameInput() {
@@ -254,6 +226,8 @@ function submitScore() {
         leaderboard.sort((a, b) => b.score - a.score);
         leaderboard = leaderboard.slice(0, 5);
         updateLeaderboard();
+        // Save leaderboard to local storage
+        localStorage.setItem('snakeGameLeaderboard', JSON.stringify(leaderboard));
     }
     nameInput.style.display = 'none';
     resetGame();
@@ -269,17 +243,15 @@ function updateLeaderboard() {
 }
 
 function initGame() {
-    snake = [{x: 200, y: 200}];
-    dx = 20;
+    snake = [INITIAL_SNAKE_POSITION];
+    dx = GRID_SIZE;
     dy = 0;
     score = 0;
-    
-    currentGameSpeed = isMobileDevice() ? mobileGameSpeed : initialGameSpeed;
+    gameSpeed = isMobileDevice() ? MOBILE_GAME_SPEED : INITIAL_GAME_SPEED;
     
     scoreElement.textContent = 'Score: 0';
     createFood();
-    addKeyboardListener();
-    gameLoop = setInterval(moveSnake, currentGameSpeed);
+    gameLoop = setInterval(moveSnake, gameSpeed);
     startButton.style.display = 'none';
     restartButton.style.display = 'block';
 
@@ -293,12 +265,11 @@ function initGame() {
 
 function resetGame() {
     clearInterval(gameLoop);
-    removeKeyboardListener();
-    snake = [{x: 200, y: 200}];
-    dx = 20;
+    snake = [INITIAL_SNAKE_POSITION];
+    dx = GRID_SIZE;
     dy = 0;
     score = 0;
-    currentGameSpeed = isMobileDevice() ? mobileGameSpeed : initialGameSpeed;
+    gameSpeed = isMobileDevice() ? MOBILE_GAME_SPEED : INITIAL_GAME_SPEED;
     scoreElement.textContent = 'Score: 0';
     createFood();
     updateGameBoard();
@@ -308,6 +279,9 @@ function resetGame() {
     // Reset game board size
     gameBoard.style.width = '';
     gameBoard.style.height = '';
+    if (isFullscreen) {
+        toggleFullscreen();
+    }
 }
 
 function restartGame() {
@@ -315,21 +289,80 @@ function restartGame() {
     initGame();
 }
 
-function addKeyboardListener() {
-    document.addEventListener('keydown', changeDirection);
-}
-
-function removeKeyboardListener() {
-    document.removeEventListener('keydown', changeDirection);
-}
-
-startButton.addEventListener('click', initGame);
-restartButton.addEventListener('click', restartGame);
-submitScoreButton.addEventListener('click', submitScore);
-
-checkbox.addEventListener('change', () => {
+function toggleDarkMode() {
     document.body.classList.toggle('dark-mode');
-});
+    // Save dark mode preference to local storage
+    localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
+    // Redraw the game board to ensure visibility
+    updateGameBoard();
+}
 
-createFood();
-updateGameBoard();
+function toggleFullscreen() {
+    isFullscreen = !isFullscreen;
+    document.body.classList.toggle('fullscreen-mode', isFullscreen);
+    
+    fullscreenToggle.innerHTML = isFullscreen ? '<i class="fas fa-compress"></i>' : '<i class="fas fa-expand"></i>';
+    
+    if (isFullscreen) {
+        document.documentElement.requestFullscreen();
+    } else {
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+        }
+    }
+    
+    updateGameBoardSize();
+    updateGameBoard();
+}
+
+function updateGameBoard() {
+    // Clear previous state
+    while (gameBoard.firstChild) {
+        gameBoard.removeChild(gameBoard.firstChild);
+    }
+
+    const cellSize = gameBoard.clientWidth / GRID_SIZE;
+
+    // Draw snake
+    snake.forEach((part, index) => {
+        const snakePart = document.createElement('div');
+        snakePart.style.left = `${part.x / GRID_SIZE * 100}%`;
+        snakePart.style.top = `${part.y / GRID_SIZE * 100}%`;
+        snakePart.style.width = `${cellSize}px`;
+        snakePart.style.height = `${cellSize}px`;
+        snakePart.classList.add('snake-part');
+        if (index === 0) snakePart.classList.add('snake-head');
+        gameBoard.appendChild(snakePart);
+    });
+
+    // Draw food
+    const foodElement = document.createElement('div');
+    foodElement.style.left = `${food.x / GRID_SIZE * 100}%`;
+    foodElement.style.top = `${food.y / GRID_SIZE * 100}%`;
+    foodElement.style.width = `${cellSize}px`;
+    foodElement.style.height = `${cellSize}px`;
+    foodElement.classList.add('food');
+    gameBoard.appendChild(foodElement);
+}
+
+// Initialize game
+function init() {
+    // Load leaderboard from local storage
+    const savedLeaderboard = localStorage.getItem('snakeGameLeaderboard');
+    if (savedLeaderboard) {
+        leaderboard = JSON.parse(savedLeaderboard);
+        updateLeaderboard();
+    }
+
+    // Load dark mode preference
+    const darkModePreference = localStorage.getItem('darkMode');
+    if (darkModePreference === 'true') {
+        document.body.classList.add('dark-mode');
+        checkbox.checked = true;
+    }
+
+    createFood();
+    updateGameBoard();
+}
+
+init();
