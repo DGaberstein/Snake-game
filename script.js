@@ -167,6 +167,12 @@ function createFood() {
 
 function moveSnake() {
     const head = {x: snake[0].x + dx, y: snake[0].y + dy};
+    
+    if (head.x < 0 || head.x >= 400 || head.y < 0 || head.y >= 400) {
+        gameOver();
+        return;
+    }
+    
     snake.unshift(head);
 
     if (head.x === food.x && head.y === food.y) {
@@ -179,6 +185,7 @@ function moveSnake() {
     }
 
     if (isGameOver()) {
+        gameOver();
         return;
     }
 
@@ -206,21 +213,17 @@ function updateGameBoard() {
 
 function isGameOver() {
     const head = snake[0];
-    if (
-        head.x < 0 || head.x >= 400 ||
-        head.y < 0 || head.y >= 400 ||
-        snake.slice(1).some(part => part.x === head.x && part.y === head.y)
-    ) {
-        clearInterval(gameLoop);
-        removeKeyboardListener();
-        if (score > 0) {
-            showNameInput();
-        } else {
-            resetGame();
-        }
-        return true;
+    return snake.slice(1).some(part => part.x === head.x && part.y === head.y);
+}
+
+function gameOver() {
+    clearInterval(gameLoop);
+    removeKeyboardListener();
+    if (score > 0) {
+        showNameInput();
+    } else {
+        resetGame();
     }
-    return false;
 }
 
 function increaseSpeed() {
