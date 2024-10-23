@@ -1,6 +1,6 @@
 // Constants
 const GRID_SIZE = 20;
-const INITIAL_SNAKE_POSITION = { x: 200, y: 200 };
+const INITIAL_SNAKE_POSITION = { x: Math.floor(GRID_SIZE / 2), y: Math.floor(GRID_SIZE / 2) };
 const INITIAL_GAME_SPEED = 250;
 const MOBILE_GAME_SPEED = 250;
 const SPEED_INCREASE_RATE = 0.0025;
@@ -23,15 +23,14 @@ const fullscreenToggle = document.getElementById('fullscreen-toggle');
 // Game state
 let snake = [INITIAL_SNAKE_POSITION];
 let food = {};
-let dx = GRID_SIZE;
+let dx = 1;
 let dy = 0;
 let score = 0;
 let gameSpeed = INITIAL_GAME_SPEED;
 let gameLoop;
 let leaderboard = [];
 let isFullscreen = false;
-
-// Touch handling
+let cellSize;
 let touchStartX = 0;
 let touchStartY = 0;
 
@@ -60,6 +59,20 @@ submitScoreButton.addEventListener('click', submitScore);
 checkbox.addEventListener('change', toggleDarkMode);
 fullscreenToggle.addEventListener('click', toggleFullscreen);
 window.addEventListener('resize', updateGameBoardSize);
+
+function submitScore() {
+    if (score > 0) {
+        const playerName = playerNameInput.value.trim() || 'Anonymous';
+        leaderboard.push({name: playerName, score: score});
+        leaderboard.sort((a, b) => b.score - a.score);
+        leaderboard = leaderboard.slice(0, 5);
+        updateLeaderboard();
+        // Save leaderboard to local storage
+        localStorage.setItem('snakeGameLeaderboard', JSON.stringify(leaderboard));
+    }
+    nameInput.style.display = 'none';
+    resetGame();
+}
 
 // Utility Functions
 function isMobileDevice() {
@@ -91,33 +104,44 @@ function handleTouchMove(event) {
     event.preventDefault();
 }
 
+function updateGameBoardSize() {
+    const boardSize = Math.min(window.innerWidth, window.innerHeight) * 0.8;
+    gameBoard.style.width = `${boardSize}px`;
+    gameBoard.style.height = `${boardSize}px`;
+    cellSize = boardSize / GRID_SIZE;
+}
+
 function changeDirection(event) {
     const LEFT_KEY = 37;
     const RIGHT_KEY = 39;
     const UP_KEY = 38;
     const DOWN_KEY = 40;
+    const W_KEY = 87;
+    const A_KEY = 65;
+    const S_KEY = 83;
+    const D_KEY = 68;
 
     const keyPressed = event.keyCode;
-    const goingUp = dy === -GRID_SIZE;
-    const goingDown = dy === GRID_SIZE;
-    const goingRight = dx === GRID_SIZE;
-    const goingLeft = dx === -GRID_SIZE;
+    const goingUp = dy === -1;
+    const goingDown = dy === 1;
+    const goingRight = dx === 1;
+    const goingLeft = dx === -1;
 
-    if (keyPressed === LEFT_KEY && !goingRight) {
-        dx = -GRID_SIZE;
+    if ((keyPressed === LEFT_KEY || keyPressed === A_KEY) && !goingRight) {
+        dx = -1;
         dy = 0;
     }
-    if (keyPressed === UP_KEY && !goingDown) {
+    if ((keyPressed === UP_KEY || keyPressed === W_KEY) && !goingDown) {
         dx = 0;
-        dy = -GRID_SIZE;
+        dy = -1;
     }
-    if (keyPressed === RIGHT_KEY && !goingLeft) {
-        dx = GRID_SIZE;
+    if ((keyPressed === RIGHT_KEY || keyPressed === D_KEY) && !goingLeft) {
+        dx = 1;
         dy = 0;
     }
-    if (keyPressed === DOWN_KEY && !goingUp) {
+    if ((keyPressed === DOWN_KEY || keyPressed === S_KEY) && !goingUp) {
         dx = 0;
-        dy = GRID_SIZE;
+        dy = 1;
     }
 }
 
@@ -134,9 +158,15 @@ function createFood() {
 
 function moveSnake() {
     const head = { 
-        x: (snake[0].x + dx / GRID_SIZE + GRID_SIZE) % GRID_SIZE, 
-        y: (snake[0].y + dy / GRID_SIZE + GRID_SIZE) % GRID_SIZE 
+        x: snake[0].x + dx, 
+        y: snake[0].y + dy 
     };
+    
+    // Check for wall collision
+    if (head.x < 0 || head.x >= GRID_SIZE || head.y < 0 || head.y >= GRID_SIZE) {
+        gameOver();
+        return;
+    }
     
     if (isCollision(head)) {
         gameOver();
@@ -155,43 +185,6 @@ function moveSnake() {
     }
 
     updateGameBoard();
-}
-
-function isCollision(position) {
-    return snake.slice(1).some(part => part.x === position.x && part.y === position.y);
-}
-
-function updateGameBoard() {
-    // Clear previous state
-    while (gameBoard.firstChild) {
-        gameBoard.removeChild(gameBoard.firstChild);
-    }
-
-    // Draw snake
-    snake.forEach((part, index) => {
-        const snakePart = document.createElement('div');
-        snakePart.style.left = `${part.x}px`;
-        snakePart.style.top = `${part.y}px`;
-        snakePart.classList.add('snake-part');
-        if (index === 0) snakePart.classList.add('snake-head');
-        gameBoard.appendChild(snakePart);
-    });
-
-    // Draw food
-    const foodElement = document.createElement('div');
-    foodElement.style.left = `${food.x}px`;
-    foodElement.style.top = `${food.y}px`;
-    foodElement.classList.add('food');
-    gameBoard.appendChild(foodElement);
-}
-
-function gameOver() {
-    clearInterval(gameLoop);
-    if (score > 0) {
-        showNameInput();
-    } else {
-        resetGame();
-    }
 }
 
 function increaseSpeed() {
@@ -213,36 +206,56 @@ function resetGameLoop() {
     gameLoop = setInterval(moveSnake, gameSpeed);
 }
 
+function gameOver() {
+    clearInterval(gameLoop);
+    if (score > 0) {
+        showNameInput();
+    } else {
+        resetGame();
+    }
+}
+
 function showNameInput() {
     finalScoreSpan.textContent = score;
     nameInput.style.display = 'block';
 }
 
-function submitScore() {
-    if (score > 0) {
-        const playerName = playerNameInput.value.trim() || 'Anonymous';
-        leaderboard.push({name: playerName, score: score});
-        leaderboard.sort((a, b) => b.score - a.score);
-        leaderboard = leaderboard.slice(0, 5);
-        updateLeaderboard();
-        // Save leaderboard to local storage
-        localStorage.setItem('snakeGameLeaderboard', JSON.stringify(leaderboard));
-    }
-    nameInput.style.display = 'none';
-    resetGame();
+function isCollision(position) {
+    // Check if snake hits itself
+    return snake.slice(1).some(part => part.x === position.x && part.y === position.y);
 }
 
-function updateLeaderboard() {
-    leaderboardList.innerHTML = '';
-    leaderboard.forEach((entry, index) => {
-        const li = document.createElement('li');
-        li.textContent = `${index + 1}. ${entry.name}: ${entry.score}`;
-        leaderboardList.appendChild(li);
+function updateGameBoard() {
+    // Clear previous state
+    while (gameBoard.firstChild) {
+        gameBoard.removeChild(gameBoard.firstChild);
+    }
+
+    // Draw snake
+    snake.forEach((part, index) => {
+        const snakePart = document.createElement('div');
+        snakePart.style.left = `${part.x * cellSize}px`;
+        snakePart.style.top = `${part.y * cellSize}px`;
+        snakePart.style.width = `${cellSize}px`;
+        snakePart.style.height = `${cellSize}px`;
+        snakePart.classList.add('snake-part');
+        if (index === 0) snakePart.classList.add('snake-head');
+        gameBoard.appendChild(snakePart);
     });
+
+    // Draw food
+    const foodElement = document.createElement('div');
+    foodElement.style.left = `${food.x * cellSize}px`;
+    foodElement.style.top = `${food.y * cellSize}px`;
+    foodElement.style.width = `${cellSize}px`;
+    foodElement.style.height = `${cellSize}px`;
+    foodElement.classList.add('food');
+    gameBoard.appendChild(foodElement);
 }
 
 function initGame() {
-    snake = [{ x: Math.floor(GRID_SIZE / 2), y: Math.floor(GRID_SIZE / 2) }];
+    updateGameBoardSize();
+    snake = [INITIAL_SNAKE_POSITION];
     dx = 1;
     dy = 0;
     score = 0;
@@ -264,19 +277,17 @@ function initGame() {
 function resetGame() {
     clearInterval(gameLoop);
     snake = [INITIAL_SNAKE_POSITION];
-    dx = GRID_SIZE;
+    dx = 1;
     dy = 0;
     score = 0;
     gameSpeed = isMobileDevice() ? MOBILE_GAME_SPEED : INITIAL_GAME_SPEED;
     scoreElement.textContent = 'Score: 0';
     createFood();
+    updateGameBoardSize();
     updateGameBoard();
     startButton.style.display = 'inline-block';
     restartButton.style.display = 'none';
     mobileControls.style.display = 'none';
-    // Reset game board size
-    gameBoard.style.width = '';
-    gameBoard.style.height = '';
     if (isFullscreen) {
         toggleFullscreen();
     }
@@ -313,35 +324,13 @@ function toggleFullscreen() {
     updateGameBoard();
 }
 
-function updateGameBoard() {
-    // Clear previous state
-    while (gameBoard.firstChild) {
-        gameBoard.removeChild(gameBoard.firstChild);
-    }
-
-    const boardSize = gameBoard.clientWidth; // Get the current size of the game board
-    const cellSize = boardSize / GRID_SIZE;
-
-    // Draw snake
-    snake.forEach((part, index) => {
-        const snakePart = document.createElement('div');
-        snakePart.style.left = `${part.x * cellSize}px`;
-        snakePart.style.top = `${part.y * cellSize}px`;
-        snakePart.style.width = `${cellSize}px`;
-        snakePart.style.height = `${cellSize}px`;
-        snakePart.classList.add('snake-part');
-        if (index === 0) snakePart.classList.add('snake-head');
-        gameBoard.appendChild(snakePart);
+function updateLeaderboard() {
+    leaderboardList.innerHTML = '';
+    leaderboard.forEach((entry, index) => {
+        const li = document.createElement('li');
+        li.textContent = `${index + 1}. ${entry.name}: ${entry.score}`;
+        leaderboardList.appendChild(li);
     });
-
-    // Draw food
-    const foodElement = document.createElement('div');
-    foodElement.style.left = `${food.x * cellSize}px`;
-    foodElement.style.top = `${food.y * cellSize}px`;
-    foodElement.style.width = `${cellSize}px`;
-    foodElement.style.height = `${cellSize}px`;
-    foodElement.classList.add('food');
-    gameBoard.appendChild(foodElement);
 }
 
 // Initialize game
@@ -360,6 +349,7 @@ function init() {
         checkbox.checked = true;
     }
 
+    updateGameBoardSize();
     createFood();
     updateGameBoard();
 }
