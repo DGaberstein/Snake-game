@@ -2,11 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Modern Snake Game</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 </head>
 <body>
     <div class="container">
@@ -17,9 +16,6 @@
             </div>
             <div id="game-board"></div>
             <button id="restart-button" style="display: none;">Restart Game</button>
-            <button id="fullscreen-toggle" class="icon-button">
-                <i class="fas fa-expand"></i>
-            </button>
         </div>
         <div class="leaderboard-container">
             <div id="score">Score:</div>
@@ -47,14 +43,19 @@
             <button id="down-button">↓</button>
         </div>
     </div>
-    <div class="theme-switch-wrapper">
-        <label class="theme-switch" for="checkbox">
-            <input type="checkbox" id="checkbox" />
-            <div class="slider round">
-                <i class="fas fa-sun"></i>
-                <i class="fas fa-moon"></i>
-            </div>
-        </label>
+    <div class="controls-wrapper">
+        <button id="fullscreen-toggle" class="icon-button">
+            <i class="fas fa-expand"></i>
+        </button>
+        <div class="theme-switch-wrapper">
+            <label class="theme-switch" for="checkbox">
+                <input type="checkbox" id="checkbox" />
+                <div class="slider round">
+                    <i class="fas fa-sun"></i>
+                    <i class="fas fa-moon"></i>
+                </div>
+            </label>
+        </div>
     </div>
     <script src="script.js"></script>
 </body>

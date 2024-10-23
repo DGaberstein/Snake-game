@@ -123,8 +123,8 @@ function changeDirection(event) {
 
 function createFood() {
     food = {
-        x: Math.floor(Math.random() * (gameBoard.clientWidth / GRID_SIZE)) * GRID_SIZE,
-        y: Math.floor(Math.random() * (gameBoard.clientHeight / GRID_SIZE)) * GRID_SIZE
+        x: Math.floor(Math.random() * GRID_SIZE),
+        y: Math.floor(Math.random() * GRID_SIZE)
     };
     // Ensure food doesn't appear on snake
     while (snake.some(part => part.x === food.x && part.y === food.y)) {
@@ -133,7 +133,10 @@ function createFood() {
 }
 
 function moveSnake() {
-    const head = { x: snake[0].x + dx, y: snake[0].y + dy };
+    const head = { 
+        x: (snake[0].x + dx / GRID_SIZE + GRID_SIZE) % GRID_SIZE, 
+        y: (snake[0].y + dy / GRID_SIZE + GRID_SIZE) % GRID_SIZE 
+    };
     
     if (isCollision(head)) {
         gameOver();
@@ -155,11 +158,7 @@ function moveSnake() {
 }
 
 function isCollision(position) {
-    return position.x < 0 || 
-           position.x >= gameBoard.clientWidth || 
-           position.y < 0 || 
-           position.y >= gameBoard.clientHeight ||
-           snake.slice(1).some(part => part.x === position.x && part.y === position.y);
+    return snake.slice(1).some(part => part.x === position.x && part.y === position.y);
 }
 
 function updateGameBoard() {
@@ -243,8 +242,8 @@ function updateLeaderboard() {
 }
 
 function initGame() {
-    snake = [INITIAL_SNAKE_POSITION];
-    dx = GRID_SIZE;
+    snake = [{ x: Math.floor(GRID_SIZE / 2), y: Math.floor(GRID_SIZE / 2) }];
+    dx = 1;
     dy = 0;
     score = 0;
     gameSpeed = isMobileDevice() ? MOBILE_GAME_SPEED : INITIAL_GAME_SPEED;
@@ -257,10 +256,9 @@ function initGame() {
 
     if (isMobileDevice()) {
         mobileControls.style.display = 'flex';
-        // Adjust game board size for mobile
-        gameBoard.style.width = '100%';
-        gameBoard.style.height = '100vw';
     }
+    
+    updateGameBoard();
 }
 
 function resetGame() {
@@ -321,13 +319,14 @@ function updateGameBoard() {
         gameBoard.removeChild(gameBoard.firstChild);
     }
 
-    const cellSize = gameBoard.clientWidth / GRID_SIZE;
+    const boardSize = gameBoard.clientWidth; // Get the current size of the game board
+    const cellSize = boardSize / GRID_SIZE;
 
     // Draw snake
     snake.forEach((part, index) => {
         const snakePart = document.createElement('div');
-        snakePart.style.left = `${part.x / GRID_SIZE * 100}%`;
-        snakePart.style.top = `${part.y / GRID_SIZE * 100}%`;
+        snakePart.style.left = `${part.x * cellSize}px`;
+        snakePart.style.top = `${part.y * cellSize}px`;
         snakePart.style.width = `${cellSize}px`;
         snakePart.style.height = `${cellSize}px`;
         snakePart.classList.add('snake-part');
@@ -337,8 +336,8 @@ function updateGameBoard() {
 
     // Draw food
     const foodElement = document.createElement('div');
-    foodElement.style.left = `${food.x / GRID_SIZE * 100}%`;
-    foodElement.style.top = `${food.y / GRID_SIZE * 100}%`;
+    foodElement.style.left = `${food.x * cellSize}px`;
+    foodElement.style.top = `${food.y * cellSize}px`;
     foodElement.style.width = `${cellSize}px`;
     foodElement.style.height = `${cellSize}px`;
     foodElement.classList.add('food');
