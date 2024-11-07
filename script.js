@@ -1,8 +1,21 @@
 // Constants
 const GRID_SIZE = 20;
-const CELL_SIZE = 20;
+let CELL_SIZE = 20;
 const INITIAL_SNAKE_POSITION = { x: Math.floor(GRID_SIZE / 2), y: Math.floor(GRID_SIZE / 2) };
 const INITIAL_GAME_SPEED = 250;
+
+// This function to adjust cell size based on screen width
+function adjustCellSize() {
+    if (window.innerWidth <= 480) {
+        CELL_SIZE = 15; // 300px / 20 cells
+    } else {
+        CELL_SIZE = 20; // 400px / 20 cells
+    }
+}
+
+// This function initially and on window resize
+adjustCellSize();
+window.addEventListener('resize', adjustCellSize);
 
 // Game state
 let snake = [INITIAL_SNAKE_POSITION];
@@ -95,15 +108,15 @@ function updateGameBoard() {
     gameBoard.innerHTML = '';
     snake.forEach(segment => {
         const snakeElement = document.createElement('div');
-        snakeElement.style.left = `${segment.x * CELL_SIZE}px`;
-        snakeElement.style.top = `${segment.y * CELL_SIZE}px`;
+        snakeElement.style.left = `${segment.x * CELL_SIZE + 1}px`; // +1 for grid line
+        snakeElement.style.top = `${segmenment.y * CELL_SIZE + 1}px`; // +1 for grid line
         snakeElement.classList.add('snake');
         gameBoard.appendChild(snakeElement);
     });
 
     const foodElement = document.createElement('div');
-    foodElement.style.left = `${food.x * CELL_SIZE}px`;
-    foodElement.style.top = `${food.y * CELL_SIZE}px`;
+    foodElement.style.left = `${food.x * CELL_SIZE + 1}px`; // +1 for grid line
+    foodElement.style.top = `${food.y * CELL_SIZE + 1}px`; // +1 for grid line
     foodElement.classList.add('food');
     gameBoard.appendChild(foodElement);
 }

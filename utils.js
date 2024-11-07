@@ -4,9 +4,17 @@ export function isMobileDevice() {
 
 export function updateGameBoardSize(gameBoard) {
     const boardSize = Math.min(window.innerWidth, window.innerHeight) * 0.8;
-    gameBoard.style.width = `${boardSize}px`;
-    gameBoard.style.height = `${boardSize}px`;
-    return boardSize / 20; // Assuming GRID_SIZE is 20
+    const gridSize = 20;
+    const cellSize = Math.floor(boardSize / gridSize);
+    const actualBoardSize = cellSize * gridSize;
+    const borderWidth = 2;
+
+    const totalSize = actualBoardSize + (borderWidth * 2);
+
+    gameBoard.style.width = `${actualBoardSize}px`;
+    gameBoard.style.height = `${actualBoardSize}px`;
+
+    return cellSize;
 }
 
 export function toggleDarkMode() {

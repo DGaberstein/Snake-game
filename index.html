@@ -6,19 +6,27 @@
     <title>Snake Game</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="container">
         <div class="game-container">
             <div class="game-header">
                 <h1>Snake Game</h1>
-                <button id="start-button">Start Game</button>
+                <div class="game-controls">
+                    <button id="start-button">Start Game</button>
+                    <button id="pause-button" style="display: none;">Pause</button>
+                    <button id="restart-button" style="display: none;">Restart</button>
+                </div>
             </div>
             <div id="game-board"></div>
-            <button id="restart-button" style="display: none;">Restart Game</button>
+            <div id="game-stats">
+                <div id="score">Score: 0</div>
+                <div id="high-score">High Score: 0</div>
+                <div id="level">Level: 1</div>
+            </div>
         </div>
         <div class="leaderboard-container">
-            <div id="score">Score: 0</div>
             <h2>Leaderboard</h2>
             <ul id="leaderboard-list"></ul>
         </div>
@@ -33,14 +41,14 @@
     </div>
     <div id="mobile-controls" class="mobile-only">
         <div class="control-row">
-            <button id="up-button">↑</button>
+            <button id="up-button"><i class="fas fa-chevron-up"></i></button>
         </div>
         <div class="control-row">
-            <button id="left-button">←</button>
-            <button id="right-button">→</button>
+            <button id="left-button"><i class="fas fa-chevron-left"></i></button>
+            <button id="right-button"><i class="fas fa-chevron-right"></i></button>
         </div>
         <div class="control-row">
-            <button id="down-button">↓</button>
+            <button id="down-button"><i class="fas fa-chevron-down"></i></button>
         </div>
     </div>
     <div class="controls-wrapper">

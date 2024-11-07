@@ -3,20 +3,22 @@ import { updateGameBoard, updateScore, showNameInput, updateLeaderboard } from '
 import { isMobileDevice, updateGameBoardSize, toggleDarkMode, toggleFullscreen } from './utils.js';
 import { setupKeyboardControls, setupTouchControls } from './controls.js';
 
-console.log("main.js loaded");
-
 const GRID_SIZE = 20;
 let game;
 let cellSize;
 let animationId;
 let lastRender = 0;
 let isFullscreen = false;
+let isPaused = false;
 
 // DOM Elements
 const gameBoard = document.getElementById('game-board');
 const startButton = document.getElementById('start-button');
+const pauseButton = document.getElementById('pause-button');
 const restartButton = document.getElementById('restart-button');
 const scoreElement = document.getElementById('score');
+const highScoreElement = document.getElementById('high-score');
+const levelElement = document.getElementById('level');
 const fullscreenToggle = document.getElementById('fullscreen-toggle');
 const darkModeToggle = document.getElementById('checkbox');
 const submitScoreButton = document.getElementById('submit-score');
@@ -24,26 +26,37 @@ const playerNameInput = document.getElementById('player-name');
 const nameInputModal = document.getElementById('name-input');
 
 function initGame() {
-    console.log("initGame called");
-    game = new Game(GRID_SIZE);
     cellSize = updateGameBoardSize(gameBoard);
+    game = new Game(GRID_SIZE, cellSize);
     updateScore(0);
-    animationId = requestAnimationFrame(gameLoop);
+    updateHighScore();
+    updateLevel(1);
+    lastRender = 0;
+    resetPauseButton();
+    isPaused = false;
     startButton.style.display = 'none';
-    restartButton.style.display = 'block';
+    pauseButton.style.display = 'inline-block';
+    restartButton.style.display = 'inline-block';
 
     if (isMobileDevice()) {
         document.getElementById('mobile-controls').style.display = 'flex';
     }
     
-    updateGameBoard(game, gameBoard, cellSize);
+    updateGameBoard(game, gameBoard);
+    animationId = requestAnimationFrame(gameLoop);
 }
 
 function gameLoop(timestamp) {
-    if (timestamp - lastRender >= game.gameSpeed) {
+    if (isPaused) {
+        animationId = requestAnimationFrame(gameLoop);
+        return;
+    }
+
+    if (!lastRender || timestamp - lastRender >= game.gameSpeed) {
         if (game.moveSnake()) {
             updateGameBoard(game, gameBoard, cellSize);
             updateScore(game.score);
+            updateLevel(game.level);
             lastRender = timestamp;
         } else {
             gameOver();
@@ -54,7 +67,6 @@ function gameLoop(timestamp) {
 }
 
 function gameOver() {
-    console.log("Game Over");
     cancelAnimationFrame(animationId);
     if (game.score > 0) {
         showNameInput(game.score);
@@ -64,15 +76,20 @@ function gameOver() {
 }
 
 function resetGame() {
-    console.log("resetGame called");
     cancelAnimationFrame(animationId);
     startButton.style.display = 'inline-block';
+    pauseButton.style.display = 'none';
     restartButton.style.display = 'none';
     document.getElementById('mobile-controls').style.display = 'none';
+    resetPauseButton();
+}
+
+function resetPauseButton() {
+    isPaused = false;
+    pauseButton.textContent = 'Pause';
 }
 
 function submitScore() {
-    console.log("submitScore called");
     const playerName = playerNameInput.value.trim() || 'Anonymous';
     let leaderboard = JSON.parse(localStorage.getItem('snakeLeaderboard') || '[]');
     leaderboard.push({name: playerName, score: game.score});
@@ -84,61 +101,51 @@ function submitScore() {
     resetGame();
 }
 
+function updateHighScore() {
+    const highScore = localStorage.getItem('snakeHighScore') || 0;
+    highScoreElement.textContent = `High Score: ${highScore}`;
+}
+
+function updateLevel(level) {
+    levelElement.textContent = `Level: ${level}`;
+}
+
+function togglePause() {
+    isPaused = !isPaused;
+    pauseButton.textContent = isPaused ? 'Resume' : 'Pause';
+}
+
 // Event Listeners
 function addEventListeners() {
-    console.log("Adding event listeners");
-    if (startButton) {
-        console.log("Start button found");
-        startButton.addEventListener('click', () => {
-            console.log("Start button clicked");
-            initGame();
-        });
-    } else {
-        console.log("Start button not found");
-    }
+    startButton.addEventListener('click', initGame);
+    restartButton.addEventListener('click', () => {
+        resetGame();
+        initGame();
+    });
+    pauseButton.addEventListener('click', togglePause);
     
-    if (restartButton) {
-        restartButton.addEventListener('click', () => {
-            console.log("Restart button clicked");
-            resetGame();
-            initGame();
-        });
-    }
+    fullscreenToggle.addEventListener('click', () => {
+        isFullscreen = toggleFullscreen(isFullscreen, fullscreenToggle);
+        cellSize = updateGameBoardSize(gameBoard);
+        if (game) updateGameBoard(game, gameBoard, cellSize);
+    });
     
-    if (fullscreenToggle) {
-        fullscreenToggle.addEventListener('click', () => {
-            console.log("Fullscreen toggle clicked");
-            isFullscreen = toggleFullscreen(isFullscreen, fullscreenToggle);
-            cellSize = updateGameBoardSize(gameBoard);
-            if (game) updateGameBoard(game, gameBoard, cellSize);
-        });
-    }
-    
-    if (darkModeToggle) {
-        darkModeToggle.addEventListener('change', () => {
-            console.log("Dark mode toggle changed");
-            toggleDarkMode();
-        });
-    }
-    
-    if (submitScoreButton) {
-        submitScoreButton.addEventListener('click', submitScore);
-    }
+    darkModeToggle.addEventListener('change', toggleDarkMode);
+    submitScoreButton.addEventListener('click', submitScore);
 
     // Setup controls
     setupKeyboardControls((dx, dy) => {
-        if (game) game.changeDirection(dx, dy);
+        if (game && !isPaused) game.changeDirection(dx, dy);
     });
     if (isMobileDevice()) {
         setupTouchControls((dx, dy) => {
-            if (game) game.changeDirection(dx, dy);
+            if (game && !isPaused) game.changeDirection(dx, dy);
         });
     }
 }
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
-    console.log("DOMContentLoaded event fired");
     updateGameBoardSize(gameBoard);
     let leaderboard = JSON.parse(localStorage.getItem('snakeLeaderboard') || '[]');
     updateLeaderboard(leaderboard);

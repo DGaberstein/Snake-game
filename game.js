@@ -1,12 +1,14 @@
 export default class Game {
-    constructor(gridSize) {
+    constructor(gridSize, cellSize) {
         this.gridSize = gridSize;
+        this.cellSize = cellSize;
         this.snake = [{x: Math.floor(gridSize / 2), y: Math.floor(gridSize / 2)}];
         this.food = {};
         this.dx = 1;
         this.dy = 0;
         this.score = 0;
-        this.gameSpeed = 250;
+        this.level = 1;
+        this.gameSpeed = 200;
         this.createFood();
     }
 
@@ -42,6 +44,7 @@ export default class Game {
             this.score += 10;
             this.createFood();
             this.increaseSpeed();
+            this.checkLevelUp();
         } else {
             this.snake.pop();
         }
@@ -54,8 +57,14 @@ export default class Game {
     }
 
     increaseSpeed() {
-        if (this.gameSpeed > 120) {
-            this.gameSpeed -= 0.5;
+        if (this.gameSpeed > 50) {
+            this.gameSpeed -= 5;
+        }
+    }
+
+    checkLevelUp() {
+        if (this.score % 50 === 0) {
+            this.level++;
         }
     }
 

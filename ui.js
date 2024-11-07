@@ -1,10 +1,7 @@
-export function updateGameBoard(game, gameBoard, cellSize) {
-    // Clear previous state
-    while (gameBoard.firstChild) {
-        gameBoard.removeChild(gameBoard.firstChildild);
-    }
+export function updateGameBoard(game, gameBoard) {
+    gameBoard.innerHTML = '';
+    const cellSize = game.cellSize;
 
-    // Draw snake
     game.snake.forEach((part, index) => {
         const snakePart = document.createElement('div');
         snakePart.style.left = `${part.x * cellSize}px`;
@@ -16,7 +13,6 @@ export function updateGameBoard(game, gameBoard, cellSize) {
         gameBoard.appendChild(snakePart);
     });
 
-    // Draw food
     const foodElement = document.createElement('div');
     foodElement.style.left = `${game.food.x * cellSize}px`;
     foodElement.style.top = `${game.food.y * cellSize}px`;
@@ -26,13 +22,13 @@ export function updateGameBoard(game, gameBoard, cellSize) {
     gameBoard.appendChild(foodElement);
 }
 
-export function updupdateScore(score) {
-    document.getElementById('score').textContent = 'Score: ' + score;
+export function updateScore(score) {
+    document.getElementById('score').textContent = `Score: ${score}`;
 }
 
 export function showNameInput(score) {
     document.getElementById('final-score').textContent = score;
-    documeument.getElementById('name-input').style.display = 'block';
+    document.getElementById('name-input').style.display = 'block';
 }
 
 export function updateLeaderboard(leaderboard) {
