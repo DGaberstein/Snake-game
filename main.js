@@ -47,12 +47,14 @@ function initGame() {
 }
 
 function gameLoop(timestamp) {
+    console.log('gameLoop called'); // Add this
     if (isPaused) {
         animationId = requestAnimationFrame(gameLoop);
         return;
     }
 
     if (!lastRender || timestamp - lastRender >= game.gameSpeed) {
+        console.log('Moving snake'); // Add this
         if (game.moveSnake()) {
             updateGameBoard(game, gameBoard, cellSize);
             updateScore(game.score);
@@ -157,27 +159,3 @@ document.addEventListener('DOMContentLoaded', () => {
         toggleDarkMode();
     }
 });
-
-// Test for the game Loop if it is called - TODO delete if it is working after testing it
-
-function gameLoop(timestamp) {
-    console.log('gameLoop called'); // Add this
-    if (isPaused) {
-        animationId = requestAnimationFrame(gameLoop);
-        return;
-    }
-
-    if (!lastRender || timestamp - lastRender >= game.gameSpeed) {
-        console.log('Moving snake'); // Add this
-        if (game.moveSnake()) {
-            updateGameBoard(game, gameBoard, cellSize);
-            updateScore(game.score);
-            updateLevel(game.level);
-            lastRender = timestamp;
-        } else {
-            gameOver();
-            return;
-        }
-    }
-    animationId = requestAnimationFrame(gameLoop);
-}
