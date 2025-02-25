@@ -56,6 +56,7 @@ function gameLoop(timestamp) {
     if (!lastRender || timestamp - lastRender >= game.gameSpeed) {
         console.log('Moving snake'); // Add this
         if (game.moveSnake()) {
+            console.log('Snake:', game.snake); // Add this
             updateGameBoard(game, gameBoard, cellSize);
             updateScore(game.score);
             updateLevel(game.level);
