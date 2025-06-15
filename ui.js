@@ -2,6 +2,19 @@ export function updateGameBoard(game, gameBoard) {
     gameBoard.innerHTML = '';
     const cellSize = game.cellSize;
 
+    // Draw walls
+    if (game.walls) {
+        game.walls.forEach(wall => {
+            const wallElement = document.createElement('div');
+            wallElement.style.left = `${wall.x * cellSize}px`;
+            wallElement.style.top = `${wall.y * cellSize}px`;
+            wallElement.style.width = `${cellSize}px`;
+            wallElement.style.height = `${cellSize}px`;
+            wallElement.classList.add('wall');
+            gameBoard.appendChild(wallElement);
+        });
+    }
+
     game.snake.forEach((part, index) => {
         const snakePart = document.createElement('div');
         snakePart.style.left = `${part.x * cellSize}px`;
@@ -13,7 +26,6 @@ export function updateGameBoard(game, gameBoard) {
         gameBoard.appendChild(snakePart);
     });
 
-<<<<<<< HEAD
     if (game.food) {
         const foodElement = document.createElement('div');
         foodElement.style.left = `${game.food.x * cellSize}px`;
@@ -25,24 +37,8 @@ export function updateGameBoard(game, gameBoard) {
             foodElement.style.backgroundColor = game.food.color;
             foodElement.style.boxShadow = `0 0 5px ${game.food.color}`;
         }
-        // If effect is set, animate and then remove effect
-        if (game.food.effect) {
-            foodElement.classList.add('food-pop');
-            setTimeout(() => {
-                if (game.food) game.food.effect = false;
-            }, 300);
-        }
         gameBoard.appendChild(foodElement);
     }
-=======
-    const foodElement = document.createElement('div');
-    foodElement.style.left = `${game.food.x * cellSize}px`;
-    foodElement.style.top = `${game.food.y * cellSize}px`;
-    foodElement.style.width = `${cellSize}px`;
-    foodElement.style.height = `${cellSize}px`;
-    foodElement.classList.add('food');
-    gameBoard.appendChild(foodElement);
->>>>>>> 8811076d44965a501eb3e33bead11c7e22cd5559
 }
 
 export function updateScore(score) {

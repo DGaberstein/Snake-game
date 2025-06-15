@@ -7,13 +7,10 @@ export function updateGameBoardSize(gameBoard) {
     const gridSize = 20;
     const cellSize = Math.floor(boardSize / gridSize);
     const actualBoardSize = cellSize * gridSize;
-    const borderWidth = 2;
-
-    const totalSize = actualBoardSize + (borderWidth * 2);
-
+    // Set the board size to exactly the grid (border is inside with border-box)
     gameBoard.style.width = `${actualBoardSize}px`;
     gameBoard.style.height = `${actualBoardSize}px`;
-
+    gameBoard.style.boxSizing = 'border-box'; // <-- important!
     return cellSize;
 }
 

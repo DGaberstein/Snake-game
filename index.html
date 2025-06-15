@@ -14,9 +14,16 @@
             <div class="game-header">
                 <h1>Snake Game</h1>
                 <div class="game-controls">
-                    <button id="start-button">Start Game</button>
+                    <div id="mode-warning" style="color: #e53935; font-weight: bold; display: none; margin-right: 10px;">
+                        Please select a game mode (Easy or Hard) first!
+                    </div>
+                    <button id="start-button" disabled>Start Game</button>
                     <button id="pause-button" style="display: none;">Pause</button>
                     <button id="restart-button" style="display: none;">Restart</button>
+                    <div id="difficulty-select" style="display: flex; gap: 10px; margin-right: 10px;">
+                        <button id="easy-button" class="difficulty-btn">Easy</button>
+                        <button id="hard-button" class="difficulty-btn">Hard</button>
+                    </div>
                 </div>
             </div>
             <div id="game-board"></div>

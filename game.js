@@ -1,55 +1,62 @@
 export default class Game {
-    constructor(gridSize, cellSize) {
+    constructor(gridSize, cellSize, difficulty = 'easy') {
         this.gridSize = gridSize;
         this.cellSize = cellSize;
         this.snake = [{x: Math.floor(gridSize / 2), y: Math.floor(gridSize / 2)}];
         this.food = {};
-<<<<<<< HEAD
         this.dx = 1; // right
-=======
-        this.dx = 1;
->>>>>>> 8811076d44965a501eb3e33bead11c7e22cd5559
         this.dy = 0;
         this.score = 0;
         this.level = 1;
-        this.gameSpeed = 200;
+        this.gameSpeed = 150;
+        this.walls = (difficulty === 'hard') ? this.generateWalls(15) : []; // Only generate walls on hard
         this.createFood();
     }
 
+    generateWalls(count) {
+        const walls = [];
+        while (walls.length < count) {
+            const x = Math.floor(Math.random() * this.gridSize);
+            const y = Math.floor(Math.random() * this.gridSize);
+            // Don't place on snake or food or duplicate
+            if (
+                !this.snake.some(part => part.x === x && part.y === y) &&
+                !(this.food && this.food.x === x && this.food.y === y) &&
+                !walls.some(w => w.x === x && w.y === y)
+            ) {
+                walls.push({x, y});
+            }
+        }
+        return walls;
+    }
+
     createFood() {
-<<<<<<< HEAD
         const colors = ['#FF5722', '#FFEB3B', '#2196F3', '#E91E63', '#4CAF50', '#9C27B0', '#FFC107', '#00BCD4'];
         const emptyCells = [];
         for (let x = 0; x < this.gridSize; x++) {
             for (let y = 0; y < this.gridSize; y++) {
-                if (!this.snake.some(part => part.x === x && part.y === y)) {
+                if (
+                    !this.snake.some(part => part.x === x && part.y === y) &&
+                    !this.walls.some(w => w.x === x && w.y === y)
+                ) {
                     emptyCells.push({ x, y });
                 }
             }
         }
         if (emptyCells.length === 0) {
             this.food = null;
-            console.log('No empty cells left. Game won!');
             return;
         }
         const pos = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+        let lastColor = this.food?.color;
+        let colorChoices = colors.filter(c => c !== lastColor);
+        let color = colorChoices.length > 0 ? colorChoices[Math.floor(Math.random() * colorChoices.length)] : colors[0];
         this.food = {
             x: pos.x,
             y: pos.y,
-            color: colors[Math.floor(Math.random() * colors.length)],
+            color: color,
             effect: true
         };
-        console.log('New food at', this.food.x, this.food.y, 'snake length:', this.snake.length);
-=======
-        this.food = {
-            x: Math.floor(Math.random() * this.gridSize),
-            y: Math.floor(Math.random() * this.gridSize)
-        };
-        // Ensure food doesn't appear on snake
-        while (this.snake.some(part => part.x === this.food.x && part.y === this.food.y)) {
-            this.createFood();
-        }
->>>>>>> 8811076d44965a501eb3e33bead11c7e22cd5559
     }
 
     moveSnake() {
@@ -57,34 +64,35 @@ export default class Game {
             x: this.snake[0].x + this.dx, 
             y: this.snake[0].y + this.dy 
         };
-        
-        // Check for wall collision
-        if (head.x < 0 || head.x >= this.gridSize || head.y < 0 || head.y >= this.gridSize) {
+
+        // Wall collision (map border)
+        if (
+            head.x < 0 || head.x >= this.gridSize ||
+            head.y < 0 || head.y >= this.gridSize
+        ) {
             return false;
         }
-        
+
+        // Self collision
         if (this.isCollision(head)) {
             return false;
         }
-        
+
+        // Wall collision (random walls)
+        if (this.walls.some(w => w.x === head.x && w.y === head.y)) {
+            return false;
+        }
+
         this.snake.unshift(head);
 
-<<<<<<< HEAD
         if (this.food && head.x === this.food.x && head.y === this.food.y) {
-=======
-        if (head.x === this.food.x && head.y === this.food.y) {
->>>>>>> 8811076d44965a501eb3e33bead11c7e22cd5559
             this.score += 10;
             this.createFood();
             this.increaseSpeed();
             this.checkLevelUp();
-<<<<<<< HEAD
             if (!this.food) {
-                // No more food can be placed, player wins!
-                return "win";
+                return false;
             }
-=======
->>>>>>> 8811076d44965a501eb3e33bead11c7e22cd5559
         } else {
             this.snake.pop();
         }
@@ -109,7 +117,7 @@ export default class Game {
     }
 
     changeDirection(dx, dy) {
-        if (this.dx === -dx || this.dy === -dy) return; // Prevent 180-degree turns
+        if (this.dx === -dx || this.dy === -dy) return;
         this.dx = dx;
         this.dy = dy;
     }
