@@ -4,7 +4,11 @@ export default class Game {
         this.cellSize = cellSize;
         this.snake = [{x: Math.floor(gridSize / 2), y: Math.floor(gridSize / 2)}];
         this.food = {};
+<<<<<<< HEAD
         this.dx = 1; // right
+=======
+        this.dx = 1;
+>>>>>>> 8811076d44965a501eb3e33bead11c7e22cd5559
         this.dy = 0;
         this.score = 0;
         this.level = 1;
@@ -13,6 +17,7 @@ export default class Game {
     }
 
     createFood() {
+<<<<<<< HEAD
         const colors = ['#FF5722', '#FFEB3B', '#2196F3', '#E91E63', '#4CAF50', '#9C27B0', '#FFC107', '#00BCD4'];
         const emptyCells = [];
         for (let x = 0; x < this.gridSize; x++) {
@@ -35,6 +40,16 @@ export default class Game {
             effect: true
         };
         console.log('New food at', this.food.x, this.food.y, 'snake length:', this.snake.length);
+=======
+        this.food = {
+            x: Math.floor(Math.random() * this.gridSize),
+            y: Math.floor(Math.random() * this.gridSize)
+        };
+        // Ensure food doesn't appear on snake
+        while (this.snake.some(part => part.x === this.food.x && part.y === this.food.y)) {
+            this.createFood();
+        }
+>>>>>>> 8811076d44965a501eb3e33bead11c7e22cd5559
     }
 
     moveSnake() {
@@ -54,15 +69,22 @@ export default class Game {
         
         this.snake.unshift(head);
 
+<<<<<<< HEAD
         if (this.food && head.x === this.food.x && head.y === this.food.y) {
+=======
+        if (head.x === this.food.x && head.y === this.food.y) {
+>>>>>>> 8811076d44965a501eb3e33bead11c7e22cd5559
             this.score += 10;
             this.createFood();
             this.increaseSpeed();
             this.checkLevelUp();
+<<<<<<< HEAD
             if (!this.food) {
                 // No more food can be placed, player wins!
                 return "win";
             }
+=======
+>>>>>>> 8811076d44965a501eb3e33bead11c7e22cd5559
         } else {
             this.snake.pop();
         }

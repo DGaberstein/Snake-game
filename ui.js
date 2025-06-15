@@ -13,6 +13,7 @@ export function updateGameBoard(game, gameBoard) {
         gameBoard.appendChild(snakePart);
     });
 
+<<<<<<< HEAD
     if (game.food) {
         const foodElement = document.createElement('div');
         foodElement.style.left = `${game.food.x * cellSize}px`;
@@ -33,6 +34,15 @@ export function updateGameBoard(game, gameBoard) {
         }
         gameBoard.appendChild(foodElement);
     }
+=======
+    const foodElement = document.createElement('div');
+    foodElement.style.left = `${game.food.x * cellSize}px`;
+    foodElement.style.top = `${game.food.y * cellSize}px`;
+    foodElement.style.width = `${cellSize}px`;
+    foodElement.style.height = `${cellSize}px`;
+    foodElement.classList.add('food');
+    gameBoard.appendChild(foodElement);
+>>>>>>> 8811076d44965a501eb3e33bead11c7e22cd5559
 }
 
 export function updateScore(score) {
